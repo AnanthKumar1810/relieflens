@@ -1,0 +1,54 @@
+seed: 123
+data:
+  unknown_damage_policy: error
+
+paths:
+  raw_root: tests/fixtures/xbd
+  manifest_dir: tests/fixtures/manifests
+  artifact_dir: tests/fixtures/artifacts
+  output_dir: tests/fixtures/outputs
+split:
+  disasters:
+    train: [disaster-a, disaster-b]
+    val: [disaster-c]
+    test: [disaster-d]
+  strict_event_split: true
+image:
+  patch_size: 64
+  stride: 64
+  num_channels: 3
+  normalize: none
+model:
+  backbone: resnet18
+  pretrained: false
+  dropout: 0.0
+  num_damage_classes: 5
+training:
+  random_crop: true
+  random_crops_per_image: 4
+  epochs: 1
+  batch_size: 2
+  num_workers: 0
+  lr: 0.001
+  weight_decay: 0.0
+  amp: false
+  grad_clip_norm: 1.0
+  early_stopping_patience: 1
+  building_loss_weight: 1.0
+  damage_loss_weight: 1.0
+  damage_class_weights: [0.20, 1.0, 1.5, 2.0, 2.5]
+  focal_gamma: 2.0
+calibration:
+  max_pixels: 5000
+  init_temperature: 1.0
+triage:
+  severe_classes: [3, 4]
+  top_fractions: [0.10, 0.20, 0.30]
+inference:
+  device: cpu
+  checkpoint: tests/fixtures/artifacts/best.pt
+
+registration:
+  max_shift_pixels: 12.0
+  min_phase_response: 0.05
+

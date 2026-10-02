@@ -1,0 +1,66 @@
+seed: 42
+
+data:
+  unknown_damage_policy: error
+
+paths:
+  raw_root: data/raw/xbd
+  manifest_dir: data/manifests
+  artifact_dir: artifacts
+  output_dir: outputs
+
+split:
+  disasters:
+    train:
+      - hurricane-harvey
+      - santa-rosa-wildfire
+    val:
+      - hurricane-michael
+    test:
+      - midwest-flooding
+  strict_event_split: true
+
+image:
+  patch_size: 256
+  stride: 256
+  num_channels: 3
+  normalize: imagenet
+
+model:
+  backbone: resnet18
+  pretrained: true
+  dropout: 0.1
+  num_damage_classes: 5
+
+training:
+  random_crop: true
+  random_crops_per_image: 4
+  epochs: 10
+  batch_size: 4
+  num_workers: 2
+  lr: 0.0003
+  weight_decay: 0.0001
+  amp: true
+  grad_clip_norm: 1.0
+  early_stopping_patience: 4
+  building_loss_weight: 1.0
+  damage_loss_weight: 1.0
+  damage_class_weights: [0.20, 1.0, 1.8, 2.5, 3.0]
+  focal_gamma: 2.0
+
+calibration:
+  max_pixels: 100000
+  init_temperature: 1.0
+
+triage:
+  severe_classes: [3, 4]
+  top_fractions: [0.10, 0.20, 0.30]
+
+inference:
+  device: auto
+  checkpoint: artifacts/best.pt
+
+registration:
+  max_shift_pixels: 12.0
+  min_phase_response: 0.05
+
